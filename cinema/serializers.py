@@ -26,7 +26,9 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    genres = serializers.ListField(child=serializers.IntegerField(), required=True)  # Ensure this is required
+    genres = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True)
 
     class Meta:
         model = Movie
