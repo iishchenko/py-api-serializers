@@ -26,17 +26,11 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 
 class MovieSerializer(serializers.ModelSerializer):
-    genres = serializers.StringRelatedField(many=True)
-    actors = serializers.SerializerMethodField()
+    genres = serializers.ListField(child=serializers.IntegerField(), required=True)  # Ensure this is required
 
     class Meta:
         model = Movie
         fields = ["id", "title", "description", "duration", "genres", "actors"]
-
-    def get_actors(self, obj):
-        return [(f"{actor.first_name} "
-                 f"{actor.last_name}")
-                for actor in obj.actors.all()]
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
