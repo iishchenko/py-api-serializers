@@ -28,18 +28,14 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     genres = serializers.StringRelatedField(many=True)
-    actors = serializers.ListField(child=serializers.PrimaryKeyRelatedField(queryset=Actor.objects.all()), required=False)
+    actors = serializers.SerializerMethodField()
 
     class Meta:
         model = Movie
         fields = ['id', 'title', 'description', 'duration', 'genres', 'actors']
 
-    def validate(self, attrs):
-        # Add custom validation logic here if needed
-        if 'actors' in attrs:
-            if not attrs['actors']:
-                raise ValidationError('At least one actor must be specified.')
-        return attrs
+    def get_actors(self, obj):
+        return [f"{actor.first_name} {actor.last_name}" for actor in obj.actors.all()]
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
