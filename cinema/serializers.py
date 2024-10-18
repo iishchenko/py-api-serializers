@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession
 
 
@@ -27,16 +28,18 @@ class CinemaHallSerializer(serializers.ModelSerializer):
 
 class MovieSerializer(serializers.ModelSerializer):
     genres = serializers.StringRelatedField(many=True)
-    actors = serializers.SerializerMethodField()
+    actors = serializers.ListField(child=serializers.PrimaryKeyRelatedField(queryset=Actor.objects.all()), required=False)
 
     class Meta:
         model = Movie
-        fields = ["id", "title", "description", "duration", "genres", "actors"]
+        fields = ['id', 'title', 'description', 'duration', 'genres', 'actors']
 
-    def get_actors(self, obj):
-        return [(f"{actor.first_name}"
-                 f" {actor.last_name}")
-                for actor in obj.actors.all()]
+    def validate(self, attrs):
+        # Add custom validation logic here if needed
+        if 'actors' in attrs:
+            if not attrs['actors']:
+                raise ValidationError('At least one actor must be specified.')
+        return attrs
 
 
 class MovieSessionSerializer(serializers.ModelSerializer):
